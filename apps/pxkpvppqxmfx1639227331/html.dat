@@ -1,0 +1,228 @@
+div(style="width: 100%; height: 100%;")
+    mixin codearea(tab)
+        div(style="overflow: hidden; height: 100%; width: 100%;" ng-click="app.tab.active('{$tab$}')" ng-if="app.editor.viewstate && layout.accessable_tab.includes('{$tab$}')" ng-cloak)
+            .code-select.bg-dark.d-flex(style="margin-top: -2px;")
+                .btn.btn-square.btn-sm.p-2(ng-repeat="code in app.editor.code.list" ng-click="app.editor.code.change('{$tab$}', code.id)" ng-class="configuration.tab.{$tab$}_val == code.id ? 'btn-white' : 'btn-dark'") {{code.name}}
+
+            div(style="height: calc(100% - 36px);")
+                div(ng-if="['preview', 'dic'].includes(configuration.tab.{$tab$}_val) == false" ng-model="app.data[configuration.tab.{$tab$}_val]" ui-monaco-opts="app.editor.properties['{$tab$}']" ui-monaco)
+                div(ng-if="configuration.tab.{$tab$}_val == 'dic'" ng-model="app.data[configuration.tab.{$tab$}_val][configuration.tab.{$tab$}_language]" ui-monaco-opts="app.editor.properties['{$tab$}']" ui-monaco)
+
+                .code-preview(ng-if="configuration.tab.{$tab$}_val == 'preview'" style="max-width: none; width: 100%; height: 100%;")
+                    iframe.preview(style="height: 100%;" ng-show="app.preview.status")
+                    table(ng-if="!app.preview.status" style="width: 100%; height: 100%;")
+                        tr
+                            td(style="text-align: center; vertical-align: middle;")
+                                .spinner-grow.text-dark(style="width: 120px; height: 120px;")
+
+                div(ng-if="app.tab.activetab != '{$tab$}' && ['preview'].includes(configuration.tab.{$tab$}_val) == false" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: rgba(0,0,0,.05); z-index: 9999;")
+
+    .display-none(style="display: none;")
+        input#import-file(type="file" accept=".json,application/json")
+
+    .bg-dark.text-center(ng-if="loading.status" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 99999; padding-top: 40vh; opacity: .6;")
+        .spinner-grow.text-white(style="width: 60px; height: 60px;")
+
+    .fixed-top
+        header.navbar.navbar-expand-md.navbar-dark
+            .container(style="max-width: none;")
+                button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbar-menu')
+                    span.navbar-toggler-icon
+
+                .navbar-brand.navbar-brand-autodark.d-none-navbar-horizontal.pr-0.pr-md-3
+                    table(style='color: #d7e0fd; cursor: pointer;')
+                        tr
+                            td.p-3.pb-0.pt-1.pr-2(style="vertical-align: middle;")
+                                img(src='/resources/themes/datahub/img/logo.png' style='height: 24px; margin-right: 4px;')
+                                span(style="font-family: 'MAIN-EB'; font-size: 24px; line-height: 1;") DIZEST
+
+                            td(style="vertical-align: middle;")
+                                h3.m-0.p-0 Dataset Editor
+
+                #navbar-menu.navbar.navbar-collapse.collapse
+                    ul.navbar-nav
+                    ul.navbar-nav.flex-row.order-md-last.mr-2(style="align-items: center;")
+                        li.nav-item.p-0.pr-2
+                            .layout-selector.p-2(ng-class="layout.active_layout == 1 ? 'active' : ''" ng-click="layout.change(1)")
+                                .layout-icon
+                                    .layout-row
+                                        .layout-column
+                        li.nav-item.p-0.pr-2
+                            .layout-selector.p-2(ng-class="layout.active_layout == 2 ? 'active' : ''" ng-click="layout.change(2)")
+                                .layout-icon
+                                    .layout-row
+                                        .layout-column
+                                        .layout-column
+                        li.nav-item.p-0.pr-2
+                            .layout-selector.p-2(ng-class="layout.active_layout == 3 ? 'active' : ''" ng-click="layout.change(3)")
+                                .layout-icon
+                                    .layout-row
+                                        .layout-column
+                                        .layout-column
+                                        .layout-column
+                        
+                        li.nav-item.p-0.pr-2
+                            .layout-selector.p-2(ng-class="layout.active_layout == 4 ? 'active' : ''" ng-click="layout.change(4)")
+                                .layout-icon.rows-2
+                                    .layout-row
+                                        .layout-column
+                                    .layout-row
+                                        .layout-column
+                        li.nav-item.p-0.pr-2
+                            .layout-selector.p-2(ng-class="layout.active_layout == 5 ? 'active' : ''" ng-click="layout.change(5)")
+                                .layout-icon.rows-2
+                                    .layout-row
+                                        .layout-column
+                                        .layout-column
+                                    .layout-row
+                                        .layout-column
+                        li.nav-item.p-0.pr-4
+                            .layout-selector.p-2(ng-class="layout.active_layout == 6 ? 'active' : ''" ng-click="layout.change(6)")
+                                .layout-icon.rows-2
+                                    .layout-row
+                                        .layout-column
+                                        .layout-column
+                                        .layout-column
+                                    .layout-row
+                                        .layout-column
+
+                        li.nav-item.p-0.pr-2
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="event.select_file()")
+                                i.fas.fa-upload
+
+                        li.nav-item.p-0.pr-2
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-href="/wiz/export/{{mode}}/{{ app.data.namespace }}" target="_blank")
+                                i.fas.fa-download
+
+                        li.nav-item.p-0.pr-2
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="app.clean()")
+                                span.nav-link-title(style="font-size: 14px;") Clean
+                        
+                        li.nav-item.p-0.pr-2
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="modal.delete()")
+                                span.nav-link-title(style="font-size: 14px;") Delete
+
+                        li.nav-item.p-0.pr-2
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="app.save()")
+                                span.nav-link-title(style="font-size: 14px;") Save
+
+                        li.nav-item.p-0
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-href='/wiz/admin/workspace/{{mode}}/list')
+                                span.nav-link-title.bold(style="font-size: 14px;")
+                                    i.fas.fa-times
+    
+    div(data-split-pane data-split-pane-properties="layout.viewstate.root")
+        .bg-dark(data-split-pane-component data-width="360px")
+            .menu-layout.p-3
+                .btn-group.w-100.mb-3
+                    button.btn(type="button" class="{{workspace.activated == 'tab1' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab1')") Dataset
+                    button.btn(type="button" class="{{workspace.activated == 'tab2' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab2')") Stage
+
+                .tab1-area(ng-if="workspace.activated == 'tab1'")
+                    .card.card-sm.mb-3
+                        .card-header.p-2.bg-dark.text-white
+                            h4.card-title(style="font-size: 16px;") Dataset
+                            
+                        .card-body
+                            label.form-label(style="font-family: 'MAIN-EB'") Title
+                            input.form-control(type='text' placeholder='Stage Title' ng-model="app.data.title" autocomplete='off')
+                        
+                        .card-body
+                            label.form-label(style="font-family: 'MAIN-EB'") Namespace
+                            input.form-control(type='text' placeholder='builder.mysql' ng-model="app.data.namespace" autocomplete='off')
+
+                        .card-body
+                            label.form-label(style="font-family: 'MAIN-EB'") Description
+                            textarea.form-control(rows=5 placeholder='Stage Description' ng-model="app.data.description" autocomplete='off')
+
+                .tab1-area(ng-if="workspace.activated == 'tab2'")
+                    .card.card-sm.mb-3
+                        .card-header.p-2.bg-dark.text-white
+                            h4.card-title(style="font-size: 16px;") Stages
+
+                            .ml-auto
+                                .btn.btn-dark.btn-sm
+                                    i.fas.fa-plus
+
+                        .card-body
+                            .tree-container(ui-sortable="sortable_opt" ng-model="dataset.data")
+                                .root-tree.mb-1(ng-repeat="item in dataset.data track by $index" class="{{item.namespace == app.data.namespace ? 'active' : ''}} {{ $index > 0 ? 'sortable-item' : '' }}" ng-if="!item.hide")
+                                    .root-title
+                                        table.w-100
+                                            tr
+                                                td.w-1.text-left
+                                                    div(ng-if="$index == 0" style="width: 40px;")
+                                                        i.fas.fa-thumbtack(ng-if="$index == 0")
+                                                    div(ng-if="$index > 0" style="width: 40px;")
+                                                        i.fas.fa-arrow-up.mr-1(ng-click="$index > 1 ? dataset.data.move($index, $index-1) : '';")
+                                                        i.fas.fa-arrow-down(ng-click="dataset.data.move($index, $index+1);")
+                                                td(style="line-height: 1;" ng-click="dataset.select(item)")
+                                                    span {{item.namespace}}
+        
+                    .card.card-sm.mb-3
+                        .card-header.p-2.bg-dark.text-white
+                            h4.card-title(style="font-size: 16px;") Stage Info.
+
+                        .card-body
+                            label.form-label(style="font-family: 'MAIN-EB'") Title
+                            input.form-control(type='text' placeholder='Stage Title' ng-model="app.data.title" autocomplete='off')
+                        
+                        .card-body
+                            label.form-label(style="font-family: 'MAIN-EB'") Namespace
+                            input.form-control(type='text' placeholder='builder.mysql' ng-model="app.data.namespace" autocomplete='off')
+                        
+                        .card-body
+                            label.form-label(style="font-family: 'MAIN-EB'") Category
+                            select.form-select(ng-model="app.data.category")
+                                option(value="builder") Builder
+                                option(value="analysis") Analysis
+                                option(value="preprocess") Pre-Process
+                                option(value="machinelearning") Machine Learning
+                                option(value="visualization") Visualization
+
+                        .card-body
+                            label.form-label(style="font-family: 'MAIN-EB'") Description
+                            textarea.form-control(rows=5 placeholder='Stage Description' ng-model="app.data.description" autocomplete='off')
+
+                        .card-body
+                            button.btn.btn-dark.btn-block Delete Stage
+                            button.btn.btn-dark.btn-block Delete Stage
+
+        div(data-split-pane-divider data-width="0px")
+        
+        #editor-area(data-split-pane-component)
+            div(data-split-pane data-split-pane-properties="layout.viewstate.horizonal")
+                div(data-split-pane-component data-height="100%")
+                    div(data-split-pane data-split-pane-properties="layout.viewstate.vertical_1_1")
+                        div(data-split-pane-component data-width="34%")
+                            +codearea('tab1')
+                        div(data-split-pane-divider data-width="3px")
+                        div(data-split-pane-component data-width="66%")
+                            div(data-split-pane data-split-pane-properties="layout.viewstate.vertical_1_2")
+                                div(data-split-pane-component data-width="50%")
+                                    +codearea('tab2')
+                                div(data-split-pane-divider data-width="3px")
+                                div(data-split-pane-component data-width="50%")
+                                    +codearea('tab3')
+
+                div(data-split-pane-divider data-height="3px")
+
+                div(data-split-pane-component data-height="0")
+                    div(style="overflow: hidden; height: 100%; width: 100%;" ng-click="app.tab.active('tab4')" ng-if="app.editor.viewstate" ng-cloak)
+                        .code-select.bg-dark.d-flex(style="margin-top: -2px;")
+                            a.btn.btn-square.btn-sm.p-2(href="" ng-click="event.app.tabchange('tab4', 'debug')" ng-class="configuration.tab.tab4_val == 'debug' ? 'btn-white' : 'btn-dark'") DEBUG
+                            a.btn.btn-square.btn-dark.btn-sm.p-2.ml-auto(href="" ng-if="configuration.tab.tab4_val == 'debug'" ng-click="socket.clear()") CLEAR
+                            button.btn.btn-square.btn-dark.btn-sm.p-2(ng-click="socket.link()" ng-if="configuration.tab.tab4_val == 'debug'")
+                                i.fas.fa-external-link-square-alt
+                        div(style="height: calc(100% - 36px);")
+                            .debug-messages(ng-if="configuration.tab.tab4_val == 'debug'" style="overflow: auto; max-width: none; width: 100%; height: 100%; background: #000; color: #fff; padding: 8px; line-height: 1;" ng-bind-html="trustAsHtml(socket.log)")
+
+    #modal-delete.modal.fade(tabindex="-1")
+        .modal-dialog.modal-sm(role='document')
+            .modal-content
+                .modal-body
+                    .modal-title Delete
+                    div Once deleted, it cannot be restored. Are you sure you want to delete?
+                .modal-footer
+                    button.btn.btn-link.link-secondary.mr-auto(type='button' data-dismiss='modal') Cancel
+                    button.btn.btn-danger(type='button' ng-click="app.delete()") Delete

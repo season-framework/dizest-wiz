@@ -1,0 +1,236 @@
+.layout-icon {
+    display: inline-table;
+    width: 24px;
+    height: 24px;
+    border: 2px solid #ffffff;
+    border-radius: 10%;
+}
+
+.layout-icon .layout-row, .layout-icon .layout-column {
+    height: 24px;
+}
+
+.layout-icon.rows-2 .layout-row, .layout-icon.rows-2 .layout-column {
+    height: 12px;
+}
+
+.layout-icon .layout-row {
+    display: table-row;
+}
+
+.layout-icon .layout-row .layout-column {
+    border-bottom: 2px solid #ffffff;
+}
+
+.layout-icon .layout-row:last-child .layout-column {
+    border-bottom-color: transparent;
+}
+
+.layout-icon .layout-column {
+    display: table-cell;
+    border-right: 2px solid #ffffff;
+}
+
+.layout-icon .layout-column:last-child {
+    border-right-color: transparent;
+}
+
+.layout-selector {
+    display: inline-block;
+    line-height: 0;
+    border-radius: 10%;
+    cursor: pointer;
+}
+
+.layout-selector:hover, .layout-selector.active {
+    background: #ffffff;
+}
+
+.layout-selector:hover .layout-icon, .layout-selector.active .layout-icon {
+    border-color: #354052;
+}
+
+.layout-selector:hover .layout-icon .layout-row, .layout-selector.active .layout-icon .layout-row {
+    display: table-row;
+}
+
+.layout-selector:hover .layout-icon .layout-row .layout-column, .layout-selector.active .layout-icon .layout-row .layout-column {
+    border-bottom: 2px solid #354052;
+}
+
+.layout-selector:hover .layout-icon .layout-row:last-child .layout-column, .layout-selector.active .layout-icon .layout-row:last-child .layout-column {
+    border-bottom-color: transparent;
+}
+
+.layout-selector:hover .layout-icon .layout-column, .layout-selector.active .layout-icon .layout-column {
+    display: table-cell;
+    border-right: 2px solid #354052;
+}
+
+.layout-selector:hover .layout-icon .layout-column:last-child, .layout-selector.active .layout-icon .layout-column:last-child {
+    border-right-color: transparent;
+}
+
+.code-tabs tr, .code-tabs td {
+    border: none;
+    padding: 0;
+}
+
+.fixed-top#top-nav .container-xl {
+    max-width: none;
+}
+
+.code-table {
+    table-layout: fixed;
+}
+
+.code-table td {
+    /* border-right: 1px solid rgba(110, 117, 130, .2); */
+}
+
+.code-table td.gutter {
+    width: 1px;
+    background: rgba(110, 117, 130, .2);
+    cursor: col-resize;
+}
+
+.code-table tr.gutter {
+    width: 1px;
+    background: rgba(110, 117, 130, .2);
+    cursor: row-resize;
+}
+
+.code-table .code-tr td {
+    height: calc(50vh - 104px + 54px - 15px);
+    overflow: hidden;
+    vertical-align: top;
+}
+
+.code-table .code-tr td .code-input {
+    height: calc(50vh - 104px + 54px - 16px);
+    overflow: hidden;
+}
+
+.code-table .code-tr td .code-input .CodeMirror {
+    height: calc(50vh - 104px + 54px - 16px);
+    display: block;
+}
+
+.h-full .code-table .code-tr td {
+    height: calc(100vh - 183px + 84px) !important;
+}
+
+.h-full .code-table .code-tr td .code-input {
+    max-height: calc(100vh - 183px + 84px) !important;
+}
+
+.h-full .code-table .code-tr td .code-input .CodeMirror {
+    height: calc(100vh - 183px + 84px) !important;
+}
+
+.panel-context {
+    overflow: hidden !important;
+}
+
+.unselectable * {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.code-tabs td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+html, body {
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding-top: 64px;
+}
+
+.split-pane-divider {
+    background: #aaa;
+}
+
+.split-pane-component {
+    background: #fff;
+}
+
+.btn-group button {
+    box-shadow: none;
+}
+
+.tree-container {
+    font-size: 16px;
+}
+
+.tree-container .root-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tree-container .root-tree {
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.tree-container .root-tree.active {
+    background: rgba(110, 117, 130, .4);
+    border-radius: 4px;
+}
+
+.tree-container .sub .sub-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 16px;
+    padding-left: 8px;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.tree-container .sub .sub-title.active {
+    background: #fff !important;
+    color: rgb(110, 117, 130);
+}
+
+.tree-container .sub .sub-title:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.tree-container .root-title:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+th.text-center {
+    white-space: nowrap;
+}
+
+.tree-container span.namespace {
+    font-size: 14px;
+    color: rgba(255, 255, 255, .6);
+}
+
+.tree-container .sub .sub-title.active span.namespace {
+    color: rgba(0, 0, 0, .6);
+}
+
+.input-group span.input-group-text {
+    width: 100px;
+}
+
+.card {
+    border: 0;
+    border-radius: 0;
+}

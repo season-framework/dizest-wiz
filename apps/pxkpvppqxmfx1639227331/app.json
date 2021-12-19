@@ -1,0 +1,1 @@
+{"id": "pxkpvppqxmfx1639227331", "title": "editor", "namespace": "dizest.view.editor", "properties": {"html": "pug", "js": "javascript", "css": "css"}, "viewuri": "/dizest/editor/sample", "created": "2021-12-11 21:55:31", "updated": "2021-12-17 21:33:46", "theme": "datahub/empty", "controller": "base", "category": "view"}

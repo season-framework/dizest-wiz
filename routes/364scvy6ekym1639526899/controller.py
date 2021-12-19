@@ -1,0 +1,1 @@
+wiz.response.render("/dizest/editor/<namespace>", "dizest.view.editor")
