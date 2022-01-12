@@ -234,3 +234,15 @@ th.text-center {
     border: 0;
     border-radius: 0;
 }
+
+.fixed-bottom {
+    position: relative !important;
+}
+
+.card-header {
+    border-radius: 0 !important;
+}
+
+.btn {
+    font-family: MAIN-EB;
+}

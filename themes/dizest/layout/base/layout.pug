@@ -1,0 +1,26 @@
+doctype 5
+
+html(ng-app="app")
+    head
+        {$ wiz.theme('dizest', 'base', 'header.pug') | safe $}
+        
+    body.antialiased
+        script(src='/resources/themes/dizest/libs/tabler/dist/js/tabler.min.js')
+        
+        .page
+            .preview
+                {$ view | safe $}
+
+            style.
+                html,
+                body {
+                    overflow: auto;
+                }
+
+                body {
+                    padding: 32px;
+                }
+
+                .page {
+                    background: transparent;
+                }

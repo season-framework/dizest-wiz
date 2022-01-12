@@ -33,11 +33,11 @@ div(style="width: 100%; height: 100%;")
                     table(style='color: #d7e0fd; cursor: pointer;')
                         tr
                             td.p-3.pb-0.pt-1.pr-2(style="vertical-align: middle;")
-                                img(src='/resources/themes/datahub/img/logo.png' style='height: 24px; margin-right: 4px;')
+                                img(src='/resources/themes/dizest/img/logo.png' style='height: 24px; margin-right: 4px;')
                                 span(style="font-family: 'MAIN-EB'; font-size: 24px; line-height: 1;") DIZEST
 
                             td(style="vertical-align: middle;")
-                                h3.m-0.p-0 Dataset Editor
+                                h3.m-0.p-0 Workspace Editor
 
                 #navbar-menu.navbar.navbar-collapse.collapse
                     ul.navbar-nav
@@ -95,19 +95,15 @@ div(style="width: 100%; height: 100%;")
                                 i.fas.fa-download
 
                         li.nav-item.p-0.pr-2
-                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="app.clean()")
-                                span.nav-link-title(style="font-size: 14px;") Clean
-                        
-                        li.nav-item.p-0.pr-2
-                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="modal.delete()")
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="modal.delete(null)")
                                 span.nav-link-title(style="font-size: 14px;") Delete
 
                         li.nav-item.p-0.pr-2
-                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="app.save()")
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="dizest.save()")
                                 span.nav-link-title(style="font-size: 14px;") Save
 
                         li.nav-item.p-0
-                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-href='/wiz/admin/workspace/{{mode}}/list')
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-href='/dizest/list')
                                 span.nav-link-title.bold(style="font-size: 14px;")
                                     i.fas.fa-times
     
@@ -115,49 +111,46 @@ div(style="width: 100%; height: 100%;")
         .bg-dark(data-split-pane-component data-width="360px")
             .menu-layout.p-3
                 .btn-group.w-100.mb-3
-                    button.btn(type="button" class="{{workspace.activated == 'tab1' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab1')") Dataset
-                    button.btn(type="button" class="{{workspace.activated == 'tab2' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab2')") Stage
+                    button.btn(type="button" class="{{configuration.workspace == 'tab1' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab1')") Dataset
+                    button.btn(type="button" class="{{configuration.workspace == 'tab2' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab2')") Stage
 
-                .tab1-area(ng-if="workspace.activated == 'tab1'")
+                .tab1-area(ng-if="configuration.workspace == 'tab1'")
                     .card.card-sm.mb-3
                         .card-header.p-2.bg-dark.text-white
                             h4.card-title(style="font-size: 16px;") Dataset
                             
                         .card-body
                             label.form-label(style="font-family: 'MAIN-EB'") Title
-                            input.form-control(type='text' placeholder='Stage Title' ng-model="app.data.title" autocomplete='off')
+                            input.form-control(type='text' placeholder='Workspace Title' ng-model="dizest.data.title" autocomplete='off')
                         
                         .card-body
-                            label.form-label(style="font-family: 'MAIN-EB'") Namespace
-                            input.form-control(type='text' placeholder='builder.mysql' ng-model="app.data.namespace" autocomplete='off')
-
-                        .card-body
                             label.form-label(style="font-family: 'MAIN-EB'") Description
-                            textarea.form-control(rows=5 placeholder='Stage Description' ng-model="app.data.description" autocomplete='off')
+                            textarea.form-control(rows=5 placeholder='Workspace Description' ng-model="dizest.data.description" autocomplete='off')
 
-                .tab1-area(ng-if="workspace.activated == 'tab2'")
+                .tab1-area(ng-if="configuration.workspace == 'tab2'")
                     .card.card-sm.mb-3
                         .card-header.p-2.bg-dark.text-white
                             h4.card-title(style="font-size: 16px;") Stages
 
                             .ml-auto
-                                .btn.btn-dark.btn-sm
+                                .btn.btn-dark.btn-sm(ng-click="dizest.create()")
                                     i.fas.fa-plus
 
                         .card-body
-                            .tree-container(ui-sortable="sortable_opt" ng-model="dataset.data")
-                                .root-tree.mb-1(ng-repeat="item in dataset.data track by $index" class="{{item.namespace == app.data.namespace ? 'active' : ''}} {{ $index > 0 ? 'sortable-item' : '' }}" ng-if="!item.hide")
+                            .tree-container(ui-sortable="sortable_opt" ng-model="dizest.data.stage")
+                                .root-tree.pt-1.pb-1(ng-repeat="item in dizest.data.stage track by $index" class="{{item == app.data ? 'active' : ''}} {{ $index >= 0 ? 'sortable-item' : '' }}")
                                     .root-title
                                         table.w-100
                                             tr
                                                 td.w-1.text-left
                                                     div(ng-if="$index == 0" style="width: 40px;")
-                                                        i.fas.fa-thumbtack(ng-if="$index == 0")
+                                                        i.fas.fa-arrow-up.mr-1(ng-click="dizest.data.stage.move($index, $index-1)")
+                                                        i.fas.fa-arrow-down(ng-click="dizest.data.stage.move($index, $index+1)")
                                                     div(ng-if="$index > 0" style="width: 40px;")
-                                                        i.fas.fa-arrow-up.mr-1(ng-click="$index > 1 ? dataset.data.move($index, $index-1) : '';")
-                                                        i.fas.fa-arrow-down(ng-click="dataset.data.move($index, $index+1);")
-                                                td(style="line-height: 1;" ng-click="dataset.select(item)")
-                                                    span {{item.namespace}}
+                                                        i.fas.fa-arrow-up.mr-1(ng-click="dizest.data.stage.move($index, $index-1)")
+                                                        i.fas.fa-arrow-down(ng-click="dizest.data.stage.move($index, $index+1)")
+                                                td(style="line-height: 1;" ng-click="dizest.select(item)")
+                                                    span {{item.title}}
         
                     .card.card-sm.mb-3
                         .card-header.p-2.bg-dark.text-white
@@ -169,7 +162,7 @@ div(style="width: 100%; height: 100%;")
                         
                         .card-body
                             label.form-label(style="font-family: 'MAIN-EB'") Namespace
-                            input.form-control(type='text' placeholder='builder.mysql' ng-model="app.data.namespace" autocomplete='off')
+                            input.form-control(type='text' placeholder='builder.mysql' ng-model="app.data.id" autocomplete='off')
                         
                         .card-body
                             label.form-label(style="font-family: 'MAIN-EB'") Category
@@ -185,8 +178,7 @@ div(style="width: 100%; height: 100%;")
                             textarea.form-control(rows=5 placeholder='Stage Description' ng-model="app.data.description" autocomplete='off')
 
                         .card-body
-                            button.btn.btn-dark.btn-block Delete Stage
-                            button.btn.btn-dark.btn-block Delete Stage
+                            button.btn.btn-dark.btn-block(ng-click="modal.delete(app.data)") Delete Stage
 
         div(data-split-pane-divider data-width="0px")
         
@@ -215,7 +207,7 @@ div(style="width: 100%; height: 100%;")
                             button.btn.btn-square.btn-dark.btn-sm.p-2(ng-click="socket.link()" ng-if="configuration.tab.tab4_val == 'debug'")
                                 i.fas.fa-external-link-square-alt
                         div(style="height: calc(100% - 36px);")
-                            .debug-messages(ng-if="configuration.tab.tab4_val == 'debug'" style="overflow: auto; max-width: none; width: 100%; height: 100%; background: #000; color: #fff; padding: 8px; line-height: 1;" ng-bind-html="trustAsHtml(socket.log)")
+                            .dizest-debug-messages(ng-if="configuration.tab.tab4_val == 'debug'" style="overflow: auto; max-width: none; width: 100%; height: 100%; background: #000; color: #fff; padding: 8px; line-height: 1;" ng-bind-html="trustAsHtml(socket.log)")
 
     #modal-delete.modal.fade(tabindex="-1")
         .modal-dialog.modal-sm(role='document')
@@ -225,4 +217,4 @@ div(style="width: 100%; height: 100%;")
                     div Once deleted, it cannot be restored. Are you sure you want to delete?
                 .modal-footer
                     button.btn.btn-link.link-secondary.mr-auto(type='button' data-dismiss='modal') Cancel
-                    button.btn.btn-danger(type='button' ng-click="app.delete()") Delete
+                    button.btn.btn-danger(type='button' ng-click="dizest.delete()") Delete

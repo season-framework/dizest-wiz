@@ -1,0 +1,19 @@
+let WIZAPI = async (url, data) => {
+    if (!data) data = {};
+    data.mode = wiz.data.mode;
+    return await wiz.API.async(url, data);
+};
+
+let wiz_controller = async ($sce, $scope, $timeout) => {
+    const $_timeout = $timeout;
+    $timeout = (ts) => new Promise((resolve) => $_timeout(resolve, ts));
+
+    $scope.load = async () => {
+        let res = await WIZAPI("workspaces");
+        $scope.list = res.data;
+        console.log(res);
+        await $timeout();
+    }
+
+    await $scope.load();
+}

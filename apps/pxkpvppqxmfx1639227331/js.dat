@@ -1,50 +1,73 @@
+let SAMPLES = {};
+
+let shortcutjs = season.shortcut;
+
+SAMPLES.code = `# batch api
+def process(data, **opts):
+    return data
+`;
+
 const LOCALSTORAGEID = "dizest.configuration";
-const TABS = ['dataset', 'api', 'html', 'js', 'css', "preview"];
+const TABS = ['code', 'api', 'pug', 'js', 'css', "preview"];
 const CODELIST = [
-    { id: 'dataset', name: 'Dataset' },
+    { id: 'code', name: 'Batch API' },
     { id: 'api', name: 'API' },
-    { id: 'html', name: 'HTML' },
+    { id: 'pug', name: 'PUG' },
     { id: 'js', name: 'JS' },
-    { id: 'css', name: 'CSS' },
+    { id: 'css', name: 'SCSS' },
     { id: 'preview', name: 'Preview' }
 ];
 
-let PREVIEW_URL = async (app_id) => {
-    return wiz.API.url("preview/" + app_id);
+const ROOM = wiz.data.mode + "/" + wiz.data.namespace;
+let PREVIEW_URL = async (stage_id) => {
+    return "/dizest/preview/" + wiz.data.mode + "/" + wiz.data.namespace + "/" + stage_id;
 }
 
 let wiz_controller = async ($sce, $scope, $timeout) => {
-    _builder($scope, $timeout);
-    const timeout = (ts) => new Promise((resolve) => $timeout(resolve, ts));
+    let monaco_option = (language) => {
+        let opt = {
+            value: '',
+            language: language,
+            theme: "vs",
+            fontSize: 14,
+            automaticLayout: true,
+            minimap: {
+                enabled: false
+            }
+        };
 
-    let hash = location.hash.split("#")[1];
+        return opt;
+    }
+
+    const $_timeout = $timeout;
+    $timeout = (ts) => new Promise((resolve) => $_timeout(resolve, ts));
+
+    let WIZAPI = async (url, data) => {
+        if (!data) data = {};
+        data.namespace = wiz.data.namespace;
+        data.mode = wiz.data.mode;
+        return await wiz.API.async(url, data);
+    };
 
     /*
      * define variables of scope
      */
     $scope.math = Math;
     $scope.trustAsHtml = $sce.trustAsHtml;
-    $scope.configuration = {};       // state data for maintaining ui
-    $scope.layout = {};              // controller for layout
-    $scope.loading = {};             // controller for display loading
-    $scope.modal = {};               // controller for modal
-    $scope.plugin = {};              // manage plugins for ui components
+    $scope.configuration = {};
+    $scope.layout = {};
+    $scope.loading = {};
+    $scope.modal = {};
+    $scope.plugin = {};
 
     $scope.workspace = {};
-    $scope.app = {};                 // controller for code editor
-    $scope.dataset = {};            // controller for code editor
+    $scope.app = {};
+    $scope.dizest = {};
 
     $scope.shortcut = {};
     $scope.socket = {};
 
     $scope.sortable_opt = {
-        // update: function () {
-        //     $timeout(function () {
-        //         $scope.event.save(function () {
-        //             $scope.iframe.loader($scope.selected_app);
-        //         });
-        //     });
-        // },
         items: '.sortable-item',
         'ui-floating': true
     }
@@ -75,9 +98,6 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
         localStorage[LOCALSTORAGEID] = JSON.stringify(configuration);
     }, true);
 
-    /*
-     * define variables
-     */
     let BUILDER = {};
 
     /* 
@@ -155,7 +175,7 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
                 $scope.layout.viewstate.vertical_1_2.lastComponentSize = Math.round(_width / 3);
             }
 
-            await timeout();
+            await $timeout();
         }
     }
 
@@ -166,12 +186,12 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
         $scope.loading.status = false;
         $scope.loading.show = async () => {
             $scope.loading.status = true;
-            await timeout();
+            await $timeout();
         }
 
         $scope.loading.hide = async () => {
             $scope.loading.status = false;
-            await timeout();
+            await $timeout();
         }
     }
 
@@ -180,7 +200,8 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
      */
 
     BUILDER.modal = async () => {
-        $scope.modal.delete = async () => {
+        $scope.modal.delete = async (mode) => {
+            $scope.modal.delete.mode = mode;
             $('#modal-delete').modal('show');
         }
 
@@ -215,11 +236,12 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
         }
     }
 
-    BUILDER.workspace = async() => {
-        $scope.workspace.activated = 'tab1';
-        $scope.workspace.active = async(tab) =>{
-            $scope.workspace.activated = tab;
-            await timeout();
+    BUILDER.workspace = async () => {
+        if (!$scope.configuration.workspace)
+            $scope.configuration.workspace = 'tab1';
+        $scope.workspace.active = async (tab) => {
+            $scope.configuration.workspace = tab;
+            await $timeout();
         }
     }
 
@@ -230,40 +252,10 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
     BUILDER.app = {};
 
     BUILDER.app.base = async () => {
-        $scope.app.save = async (returnres) => {
-            let appdata = angular.copy($scope.app.data);
-            console.log(appdata);
-
-            // let res = await API.update(appdata);
-
-            // if (returnres) return res;
-
-            // if (res.code == 200) {
-            // toastr.success("Saved");
-            // await $scope.app.preview();
-            // } else {
-            // toastr.error(res.data);
-            // }
-
-            await $scope.shortcut.bind();
-        }
-
         $scope.app.tab = {};
         $scope.app.tab.active = async (tab) => {
             $scope.app.tab.activetab = tab;
-            await timeout();
-        }
-
-        $scope.app.delete = async () => {
-            let app_id = $scope.app.id;
-            await API.delete(app_id);
-            await $scope.browse.load();
-            if ($scope.browse.data[0]) {
-                app_id = $scope.browse.data[0].package.id;
-                location.href = APP_URL + "editor/" + app_id;
-            } else {
-                location.href = APP_URL;
-            }
+            await $timeout();
         }
 
         $scope.app.load = async (item) => {
@@ -275,29 +267,22 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
             await $scope.app.editor.build();
             await $scope.layout.change($scope.layout.active_layout);
             await $scope.loading.hide();
-            
-            // await $scope.app.preview();
 
-            await timeout(500);
+            await $scope.app.preview();
+
+            await $timeout(500);
 
             if ($scope.app.tab.activetab && $scope.app.editor.cache[$scope.app.tab.activetab])
                 $scope.app.editor.cache[$scope.app.tab.activetab].focus();
-
-            // location.href = location.pathname + "#" + app_id;
         }
 
         $scope.app.preview = async () => {
-            let url = $scope.app.data.package.viewuri;
-            if (!$scope.app.data.package.viewuri) {
-                url = await PREVIEW_URL($scope.app.id);
-            }
+            let stage_id = $scope.app.data.id;
+            if (!stage_id) return;
 
-            if (!url) {
-                return;
-            }
-
+            let url = await PREVIEW_URL(stage_id);
             $scope.app.preview.status = false;
-            await timeout();
+            await $timeout();
 
             $('iframe.preview').attr('src', url);
             $('iframe.preview').on('load', function () {
@@ -324,13 +309,13 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
             lang = lang.toLowerCase();
             $scope.app.data.dic[lang] = "{}";
             $('#modal-add-language').modal('hide');
-            await timeout();
+            await $timeout();
         }
 
         $scope.app.editor.code.langselect = async (tab) => {
             let obj = $scope.configuration.tab[tab + '_val'];
             if (obj == 'css') return 'scss';
-            if (obj == 'html') return 'pug';
+            if (obj == 'pug') return 'pug';
             if (obj == 'js') return 'javascript';
             return 'python';
         }
@@ -338,7 +323,7 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
         $scope.app.editor.code.change = async (targettab, view) => {
             if (view) {
                 $scope.configuration.tab[targettab + '_val'] = view;
-                await timeout();
+                await $timeout();
 
                 if (view == 'preview') {
                     $scope.app.preview();
@@ -360,8 +345,8 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
             } else {
                 if ($scope.app.tab.activetab != targettab) {
                     $scope.app.tab.activetab = targettab;
-                    await timeout();
-                    await timeout(500);
+                    await $timeout();
+                    await $timeout(500);
                     $scope.app.editor.cache[targettab].focus();
                 }
             }
@@ -411,11 +396,11 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
 
         $scope.app.editor.build = async () => {
             $scope.app.editor.viewstate = false;
-            await timeout();
+            await $timeout();
 
-            $scope.app.editor.properties.tab1 = $scope.monaco(await $scope.app.editor.code.langselect('tab1'));
-            $scope.app.editor.properties.tab2 = $scope.monaco(await $scope.app.editor.code.langselect('tab2'));
-            $scope.app.editor.properties.tab3 = $scope.monaco(await $scope.app.editor.code.langselect('tab3'));
+            $scope.app.editor.properties.tab1 = monaco_option(await $scope.app.editor.code.langselect('tab1'));
+            $scope.app.editor.properties.tab2 = monaco_option(await $scope.app.editor.code.langselect('tab2'));
+            $scope.app.editor.properties.tab3 = monaco_option(await $scope.app.editor.code.langselect('tab3'));
 
             let bindonload = async (targettab) => {
                 $scope.app.editor.properties[targettab].onLoad = async (editor) => {
@@ -428,21 +413,80 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
                 bindonload('tab' + i);
 
             $scope.app.editor.viewstate = true;
-            await timeout();
+            await $timeout();
         }
 
     }
 
-    BUILDER.dataset = async () => {
-        $scope.dataset.load = async () => {
-            let res = await wiz.API.async("dataset", { namespace: wiz.data.namespace });
-            console.log(res);
-            $scope.dataset.data = res.data.data;
-            await timeout();
+    BUILDER.dizest = async () => {
+        $scope.dizest.create = async () => {
+            $scope.dizest.data.stage.push({
+                title: 'new stage',
+                id: '',
+                code: SAMPLES.code
+            });
         }
 
-        $scope.dataset.select = async (item) => {
+        $scope.dizest.delete = async () => {
+            if (!$scope.modal.delete.mode) {
+                // TODO
+                // let app_id = $scope.app.id;
+                // await API.delete(app_id);
+                // await $scope.browse.load();
+                // if ($scope.browse.data[0]) {
+                //     app_id = $scope.browse.data[0].package.id;
+                //     location.href = APP_URL + "editor/" + app_id;
+                // } else {
+                //     location.href = APP_URL;
+                // }
+            } else {
+                $scope.dizest.data.stage.remove($scope.modal.delete.mode);
+            }
+
+            await $timeout();
+            $('#modal-delete').modal('hide');
+        }
+
+        $scope.dizest.save = async (returnres) => {
+            let data = angular.copy($scope.dizest.data);
+            let res = await WIZAPI("update", { data: JSON.stringify(data) });
+            if (returnres) return res;
+
+            if (res.code == 200) {
+                toastr.success("Saved");
+                await $scope.app.preview();
+            } else {
+                toastr.error(res.data);
+            }
+
+            await $scope.shortcut.bind();
+        }
+
+        $scope.dizest.load = async () => {
+            let res = await WIZAPI("workspace");
+            $scope.dizest.data = res.data;
+            await $timeout();
+        }
+
+        $scope.dizest.select = async (item) => {
             await $scope.app.load(item);
+        }
+
+        $scope.dizest.next = async () => {
+            if ($scope.dizest.data.stage.length <= 1) return;
+            let index = $scope.dizest.data.stage.indexOf($scope.app.data);
+            if ($scope.dizest.data.stage[index + 1])
+                return await $scope.app.load($scope.dizest.data.stage[index + 1]);
+            return await $scope.app.load($scope.dizest.data.stage[0]);
+        }
+
+        $scope.dizest.prev = async () => {
+            let index = $scope.dizest.data.stage.indexOf($scope.app.data);
+            if ($scope.dizest.data.stage[index - 1])
+                return await $scope.app.load($scope.dizest.data.stage[index - 1]);
+
+            index = $scope.dizest.data.stage.length - 1;
+            return await $scope.app.load($scope.dizest.data.stage[index]);
         }
     }
 
@@ -484,7 +528,7 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
                     monaco: monaco.KeyMod.Alt | monaco.KeyCode.KEY_J,
                     fn: async () => {
                         $(window).focus();
-                        await $scope.browse.prev();
+                        await $scope.dizest.prev();
                     }
                 },
                 'app_next': {
@@ -492,7 +536,7 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
                     monaco: monaco.KeyMod.Alt | monaco.KeyCode.KEY_K,
                     fn: async () => {
                         $(window).focus();
-                        await $scope.browse.next();
+                        await $scope.dizest.next();
                     }
                 },
                 'workspace_prev': {
@@ -513,7 +557,7 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
                     key: 'Ctrl KeyS',
                     monaco: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S,
                     fn: async () => {
-                        await $scope.app.save();
+                        await $scope.dizest.save();
                     }
                 },
                 'clear': {
@@ -555,7 +599,7 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
 
     await BUILDER.workspace();
 
-    await BUILDER.dataset();
+    await BUILDER.dizest();
 
     await BUILDER.app.base();
     await BUILDER.app.editor();
@@ -563,57 +607,45 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
     await BUILDER.shortcuts();
 
     let init = async () => {
-        await $scope.dataset.load();
-        await $scope.dataset.select($scope.dataset.data[0]);
+        await $scope.dizest.load();
+        await $scope.dizest.select($scope.dizest.data.stage[0]);
 
-        return
         /*
          * socket.io event binding for trace log
          */
         let ansi_up = new AnsiUp();
-        let socket = io("/wiz");
+
+        let socket = wiz.socket.get();
 
         $scope.socket.log = "";
         $scope.socket.clear = async () => {
             $scope.socket.log = "";
-            await API.timeout();
+            await $timeout();
         }
 
-        $scope.socket.link = async () => {
-            let layout = $scope.configuration.layout;
-            await $scope.layout.change(layout - 3);
-            window.open("/wiz/admin/workspace/logger", '_blank');
-        }
-
-        socket.on("connect", function (data) {
-            if (!data) return;
-            $scope.socket.id = data.sid;
+        socket.on("connect", async () => {
+            if ($scope.configuration.layout > 3)
+                socket.emit("join", { id: ROOM });
         });
 
-        socket.on("log", function (data) {
+        socket.on("log", async (data) => {
             data = data.replace(/ /gim, "__SEASONWIZPADDING__");
             data = ansi_up.ansi_to_html(data).replace(/\n/gim, '<br>').replace(/__SEASONWIZPADDING__/gim, '<div style="width: 6px; display: inline-block;"></div>');
             $scope.socket.log = $scope.socket.log + data;
-            $timeout(function () {
-                var element = $('.debug-messages')[0];
-                if (!element) return;
-                element.scrollTop = element.scrollHeight - element.clientHeight;
-            });
-        });
 
-        socket.on("message", function (data) {
-            if (data.type == "status") {
-                $scope.socket.users = data.users;
-                $timeout();
-            }
+            await $timeout();
+
+            let element = $('.dizest-debug-messages')[0];
+            if (!element) return;
+            element.scrollTop = element.scrollHeight - element.clientHeight;
         });
 
         $scope.$watch("configuration", async () => {
             let layout = $scope.configuration.layout;
             if (layout < 4) {
-                socket.emit("leave", { id: BRANCH });
+                socket.emit("leave", { id: ROOM });
             } else {
-                socket.emit("join", { id: BRANCH });
+                socket.emit("join", { id: ROOM });
             }
         }, true);
     }

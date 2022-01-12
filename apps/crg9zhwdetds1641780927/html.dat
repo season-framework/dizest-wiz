@@ -1,0 +1,2 @@
+.dizest-app
+    {$ view | safe $}
