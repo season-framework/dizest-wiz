@@ -75,7 +75,7 @@ h1 {
 }
 
 .text-primary {
-    color: $color-1;
+    color: $color-1 !important;
 }
 
 .bg-primary {
@@ -86,7 +86,8 @@ h1 {
     background: $color-1;
 
     &:hover {
-        background: $color-1-1;
+        background: $color-1;
+        border-color: $color-1-1;
     }
 }
 
@@ -532,7 +533,6 @@ label.form-label {
     }
 }
 
-
 /* custom tabler */
 .page-header {
     margin-bottom: 12px;;
@@ -544,11 +544,11 @@ label.form-label {
 }
 
 .container-xl {
-    max-width: 1204px;
+    max-width: 1280px;
 }
 
 .container {
-    max-width: 1204px;
+    max-width: 1024px;
 }
 
 .text-lowercase {
@@ -1222,5 +1222,15 @@ blockquote p {
 
     > :first-child {
         margin-top: 0.9em;
+    }
+}
+
+.btn {
+    .icon {
+        margin: 0;
+    }
+
+    *:nth-child(2) {
+        margin-left: 6px;
     }
 }

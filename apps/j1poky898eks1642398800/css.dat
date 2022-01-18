@@ -1,0 +1,8 @@
+.stage-card {
+    border: 1px solid #746C70;
+    border-radius: 0;
+
+    .card-header {
+        border-radius: 0;       
+    }
+}

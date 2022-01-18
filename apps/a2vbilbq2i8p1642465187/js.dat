@@ -1,0 +1,14 @@
+let wiz_controller = async ($sce, $scope, $timeout) => {
+    $scope.data = wiz.data.config;
+    $scope.build = async () => {
+        let data = angular.copy($scope.data);
+        let res = await wiz.API.async("install", data);
+        if (res.code == 200) {
+            location.href = "/";
+            return;
+        }
+
+
+        toastr.error("fill all configuration");
+    };
+}

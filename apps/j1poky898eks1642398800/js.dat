@@ -1,0 +1,94 @@
+let wiz_controller = async ($sce, $scope, $timeout) => {
+
+    const $_timeout = $timeout;
+    $timeout = (ts) => new Promise((resolve) => $_timeout(resolve, ts));
+
+    let WIZAPI = async (url, data) => {
+        if (!data) data = {};
+        data.namespace = wiz.data.namespace;
+        data.mode = wiz.data.mode;
+        return await wiz.API.async(url, data);
+    };
+
+    let PREVIEW_URL = (stage_id) => {
+        return "/dizest/preview/" + wiz.data.mode + "/" + wiz.data.namespace + "/" + stage_id;
+    }
+
+    $scope.dizest = {};
+
+    $scope.dizest.load = async () => {
+        let res = await WIZAPI("workspace");
+        $scope.dizest.data = res.data;
+        await $timeout();
+
+        for (let i = 0; i < $scope.dizest.data.stage.length; i++) {
+            let stage = $scope.dizest.data.stage[i];
+            await $scope.dizest.preview(stage);
+        }
+    }
+
+    $scope.dizest.pre = null;
+
+    $scope.dizest.preview = async (stage) => {
+        if (!$scope.dizest.pre) $scope.dizest.pre = stage;
+        let url = PREVIEW_URL(stage.id);
+        let iframe_id = "[id='stage-" + stage.id + "']";
+        let iframe_target = $(iframe_id);
+
+        iframe_target.attr('src', url);
+        iframe_target.on('load', async () => {
+            let iframe = $(iframe_id);
+            let min_height = 400;
+            try {
+                min_height = stage.height * 1;
+            } catch (e) {
+                min_height = 0;
+            }
+
+            if (!min_height) {
+                min_height = iframe.contents().find('.dizest-app').height();
+            }
+
+            if (min_height < 400) {
+                min_height = 400;
+            }
+
+            iframe.height(min_height);
+            iframe.contents().find('.dizest-app').attr("tabindex", -1).focus(async () => {
+                if ($scope.dizest.pre.id == stage.id) return;
+                $scope.dizest.pre = stage;
+                iframe_target.attr('src', '');
+                await $scope.dizest.preview(stage);
+            });
+
+            await $timeout();
+        });
+    }
+
+    $scope.dizest.save = async (returnres) => {
+        let data = angular.copy($scope.dizest.data);
+        let res = await WIZAPI("update", { data: JSON.stringify(data) });
+        if (returnres) return res;
+
+        if (res.code == 200) {
+            toastr.success("Saved");
+            await $scope.app.preview();
+        } else {
+            toastr.error(res.data);
+        }
+
+        await $scope.shortcut.bind();
+    }
+
+    $scope.dizest.delete = async (isdelete) => {
+        if (isdelete) {
+            let data = angular.copy($scope.dizest.data);
+            await WIZAPI("delete", { data: JSON.stringify(data) });
+            location.href = "/";
+        } else {
+            $('#modal-delete').modal('show');
+        }
+    }
+
+    await $scope.dizest.load();
+}

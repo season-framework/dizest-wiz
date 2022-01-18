@@ -15,12 +15,8 @@ def update(wiz):
     data = json.loads(data)
     data['updated'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    required = ['code', 'api', 'pug', 'js', 'css', 'preview']
-    for i in range(len(data['stage'])):
-        item = data['stage'][i]
-        for req in required:
-            if req not in item or item[req] is None:
-                data['stage'][i][req] = ''
+    if 'stage' in data:
+        del data['stage']
 
     workspace = dizest.workspace()
     workspace.update(**data)

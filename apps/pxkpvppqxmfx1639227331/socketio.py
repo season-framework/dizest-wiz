@@ -15,5 +15,5 @@ class Controller:
     def connect(self, wiz, data):
         pass
 
-    def disconnect(self, wiz, data):            
+    def disconnect(self, wiz, data):
         pass

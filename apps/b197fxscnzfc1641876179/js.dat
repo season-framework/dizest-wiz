@@ -11,8 +11,20 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
     $scope.load = async () => {
         let res = await WIZAPI("workspaces");
         $scope.list = res.data;
-        console.log(res);
         await $timeout();
+    }
+
+    $scope.create = async () => {
+        $('#create-modal').modal("show");
+    }
+
+    $scope.modal = {};
+    $scope.modal.cancel = async () => {
+        $('#create-modal').modal("hide");
+    }
+
+    $scope.modal.create = async (title) => {
+        location.href = "/dizest/editor/" + encodeURI(title);
     }
 
     await $scope.load();

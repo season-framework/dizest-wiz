@@ -1,2 +1,46 @@
-.container
-    h3 TEST
+.container.mt-4
+    .page-header.d-print-none.mb-3
+        .row.align-items-center
+            .col
+                .page-pretitle DIZEST Datahub
+                h2.page-title Workspace List
+
+            .col-auto.ms-auto.d-print-none
+                .btn-list
+                    a.btn.btn-link(href="/dizest/logout")
+                        i.fas.fa-sign-out-alt
+                        span.d-none.d-sm-inline-block Logout
+                        
+                    button.btn.btn-primary(ng-click="create()")
+                        i.fas.fa-plus
+                        span.d-none.d-sm-inline-block Create Workspace
+                    
+    .card
+        .card-table.table-responsive
+            table.table.table-vcenter.table-hover
+                thead
+                    th ID
+                    th Title
+                    th Description
+                    th Updated
+                    th
+                tr(ng-repeat="item in list")
+                    td.w-1.text-left.text-muted {{item.id}}
+                    td.w-1.text-left {{item.title}}
+                    td.text-left
+                        small.text-muted.ml-2 {{item.description}}
+                    td.w-1.text-muted {{item.updated}}
+                    td.w-1
+                        a.btn.btn-sm.btn-primary(href="/dizest/viewer/{{item.id}}")
+                            i.fas.fa-code-branch.mr-1
+                            | Workspace
+
+    #create-modal.modal.fade(tabindex="-1")
+        .modal-dialog.modal-sm(role='document')
+            .modal-content
+                .modal-body
+                    .modal-title Create Workspace
+                    input.form-control(ng-model="modal.data.title" placeholder="Namespace")
+                .modal-footer
+                    button.btn.btn-link.link-secondary.mr-auto(type='button' ng-click="modal.cancel()") Cancel
+                    button.btn.btn-primary(type='button' ng-click="modal.create(modal.data.title)") Create

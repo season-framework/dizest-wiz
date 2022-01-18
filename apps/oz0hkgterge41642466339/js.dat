@@ -1,0 +1,14 @@
+let wiz_controller = async ($sce, $scope, $timeout) => {
+    $scope.data = wiz.data.config;
+    $scope.login = async () => {
+        let data = angular.copy($scope.data);
+        let res = await wiz.API.async("login", data);
+        if (res.code == 200) {
+            location.href = "/";
+            return;
+        }
+
+        toastr.error("Incorrect Password");
+    };
+
+}

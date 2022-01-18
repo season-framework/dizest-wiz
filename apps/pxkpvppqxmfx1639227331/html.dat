@@ -18,7 +18,7 @@ div(style="width: 100%; height: 100%;")
                 div(ng-if="app.tab.activetab != '{$tab$}' && ['preview'].includes(configuration.tab.{$tab$}_val) == false" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; background: rgba(0,0,0,.05); z-index: 9999;")
 
     .display-none(style="display: none;")
-        input#import-file(type="file" accept=".json,application/json")
+        input#import-file(type="file" accept=".dz")
 
     .bg-dark.text-center(ng-if="loading.status" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 99999; padding-top: 40vh; opacity: .6;")
         .spinner-grow.text-white(style="width: 60px; height: 60px;")
@@ -87,11 +87,11 @@ div(style="width: 100%; height: 100%;")
                                         .layout-column
 
                         li.nav-item.p-0.pr-2
-                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="event.select_file()")
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-click="import_file()")
                                 i.fas.fa-upload
 
                         li.nav-item.p-0.pr-2
-                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-href="/wiz/export/{{mode}}/{{ app.data.namespace }}" target="_blank")
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-href="/dizest/export/{{wizdata.mode}}/{{ wizdata.namespace }}" target="_blank")
                                 i.fas.fa-download
 
                         li.nav-item.p-0.pr-2
@@ -103,31 +103,18 @@ div(style="width: 100%; height: 100%;")
                                 span.nav-link-title(style="font-size: 14px;") Save
 
                         li.nav-item.p-0
-                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-href='/dizest/list')
+                            a.nav-link.btn.btn-sm.text-dark.btn-white.btn-pill(ng-href='/dizest/viewer/{{dizest.data.id}}')
                                 span.nav-link-title.bold(style="font-size: 14px;")
                                     i.fas.fa-times
     
     div(data-split-pane data-split-pane-properties="layout.viewstate.root")
         .bg-dark(data-split-pane-component data-width="360px")
             .menu-layout.p-3
-                .btn-group.w-100.mb-3
-                    button.btn(type="button" class="{{configuration.workspace == 'tab1' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab1')") Dataset
+                .btn-group.w-100.mb-3.d-none
+                    button.btn(type="button" class="{{configuration.workspace == 'tab1' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab1')") Info
                     button.btn(type="button" class="{{configuration.workspace == 'tab2' ? 'btn-white' : 'btn-dark'}}" ng-click="workspace.active('tab2')") Stage
 
-                .tab1-area(ng-if="configuration.workspace == 'tab1'")
-                    .card.card-sm.mb-3
-                        .card-header.p-2.bg-dark.text-white
-                            h4.card-title(style="font-size: 16px;") Dataset
-                            
-                        .card-body
-                            label.form-label(style="font-family: 'MAIN-EB'") Title
-                            input.form-control(type='text' placeholder='Workspace Title' ng-model="dizest.data.title" autocomplete='off')
-                        
-                        .card-body
-                            label.form-label(style="font-family: 'MAIN-EB'") Description
-                            textarea.form-control(rows=5 placeholder='Workspace Description' ng-model="dizest.data.description" autocomplete='off')
-
-                .tab1-area(ng-if="configuration.workspace == 'tab2'")
+                .tab1-area
                     .card.card-sm.mb-3
                         .card-header.p-2.bg-dark.text-white
                             h4.card-title(style="font-size: 16px;") Stages
@@ -138,6 +125,9 @@ div(style="width: 100%; height: 100%;")
 
                         .card-body
                             .tree-container(ui-sortable="sortable_opt" ng-model="dizest.data.stage")
+                                .root-tree.pt-1.pb-1(ng-if="dizest.data.stage.length == 0")
+                                    .root-title.text-center.text-muted No Stages
+
                                 .root-tree.pt-1.pb-1(ng-repeat="item in dizest.data.stage track by $index" class="{{item == app.data ? 'active' : ''}} {{ $index >= 0 ? 'sortable-item' : '' }}")
                                     .root-title
                                         table.w-100
@@ -172,6 +162,10 @@ div(style="width: 100%; height: 100%;")
                                 option(value="preprocess") Pre-Process
                                 option(value="machinelearning") Machine Learning
                                 option(value="visualization") Visualization
+
+                        .card-body
+                            label.form-label(style="font-family: 'MAIN-EB'") Frame Height
+                            input.form-control(type="number" placeholder='Stage Frame Height (px)' ng-model="app.data.height" autocomplete='off')
 
                         .card-body
                             label.form-label(style="font-family: 'MAIN-EB'") Description
@@ -216,5 +210,5 @@ div(style="width: 100%; height: 100%;")
                     .modal-title Delete
                     div Once deleted, it cannot be restored. Are you sure you want to delete?
                 .modal-footer
-                    button.btn.btn-link.link-secondary.mr-auto(type='button' data-dismiss='modal') Cancel
-                    button.btn.btn-danger(type='button' ng-click="dizest.delete()") Delete
+                    button.btn.btn-link.link-secondary.mr-auto(ng-click="dizest.modal_close()") Cancel
+                    button.btn.btn-danger(ng-click="dizest.delete()") Delete

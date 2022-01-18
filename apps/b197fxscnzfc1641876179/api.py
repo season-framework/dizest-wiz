@@ -10,7 +10,8 @@ def workspaces(wiz):
     data = storage.ls()
     for i in range(len(data)):
         wp = storage.read.json(f"{data[i]}/package.dz", None)
-        del wp['stage']
+        if 'stage' in wp:
+            del wp['stage']
         wp['id'] = data[i]
         wps.append(wp)
     wiz.response.status(200, wps)
