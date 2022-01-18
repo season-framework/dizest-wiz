@@ -30,6 +30,8 @@ class Config:
             data[key] = config[key]
         self.fs.write.json("dizest.config.json", data)
 
+config = Config()
+
 class Model:
     def __init__(self, namespace, mode):
         self.mode = mode
@@ -43,18 +45,14 @@ class Model:
 
     def workspace(self):
         namespace = self.namespace
-        config = wiz.config('dizest')
-        default = os.path.join(season.core.PATH.PROJECT, "dizest", self.mode)
-        basepath = config.get(self.mode, default)
+        basepath = config.get('workspace')
         basepath = os.path.join(basepath, namespace)
         wp = dizest.workspace(basepath, logger=Model.logger)
         return wp
 
     def delete(self):
         namespace = self.namespace
-        config = wiz.config('dizest')
-        default = os.path.join(season.core.PATH.PROJECT, "dizest", self.mode)
-        basepath = config.get(self.mode, default)
+        basepath = config.get('workspace')
         basepath = os.path.join(basepath, namespace)
         fs = wiz.model("storage").use(basepath)
         fs.remove()
@@ -80,4 +78,4 @@ class Model:
 
     @staticmethod
     def config():
-        return Config()
+        return config

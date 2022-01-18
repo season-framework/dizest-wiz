@@ -1,8 +1,8 @@
 import json
 
 mode = wiz.request.query("mode", True)
-config = wiz.config('dizest')
-path = config.get(mode)
+config = wiz.model('dizest').config()
+path = config.get('workspace')
 storage = wiz.model("storage").use(path)
 
 def workspaces(wiz):
