@@ -7,10 +7,6 @@ import pathlib
 
 host = urllib.parse.urlparse(wiz.flask.request.base_url)
 host = f"{host.scheme}://{host.netloc}/dizest/log"
-
-syspath = "/opt/workspace/dizest/src"
-sys.path.insert(0, syspath)
-__package__ = "dizest"
 import dizest
 
 class Config:
