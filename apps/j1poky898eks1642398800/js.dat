@@ -1,7 +1,8 @@
 let wiz_controller = async ($sce, $scope, $timeout) => {
-
     const $_timeout = $timeout;
     $timeout = (ts) => new Promise((resolve) => $_timeout(resolve, ts));
+
+    $scope.wizdata = wiz.data;
 
     let WIZAPI = async (url, data) => {
         if (!data) data = {};
@@ -19,6 +20,9 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
     $scope.dizest.load = async () => {
         let res = await WIZAPI("workspace");
         $scope.dizest.data = res.data;
+
+        if (!$scope.dizest.data.id) $scope.dizest.data.id = wiz.data.namespace;
+
         await $timeout();
 
         for (let i = 0; i < $scope.dizest.data.stage.length; i++) {
@@ -89,6 +93,24 @@ let wiz_controller = async ($sce, $scope, $timeout) => {
             $('#modal-delete').modal('show');
         }
     }
+
+    $scope.import_file = function () {
+        $('#import-file').click();
+    }
+
+    $('#import-file').change(async () => {
+        let fr = new FileReader();
+        fr.onload = async () => {
+            let data = fr.result;
+            data = JSON.parse(data);
+            data.id = $scope.dizest.data.id;
+            $scope.dizest.data = data;
+            $scope.dizest.save();
+            await $timeout();
+        };
+        fr.readAsText($('#import-file').prop('files')[0]);
+        location.reload();
+    });
 
     await $scope.dizest.load();
 }

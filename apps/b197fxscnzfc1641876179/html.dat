@@ -1,46 +1,53 @@
-.container.mt-4
-    .page-header.d-print-none.mb-3
-        .row.align-items-center
-            .col
-                .page-pretitle DIZEST Datahub
-                h2.page-title Workspace List
+.page
+    header.navbar.navbar-expand-md.navbar-light.d-print-none
+        .container-xl
+            button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu")
+                span.navbar-toggler-icon
 
-            .col-auto.ms-auto.d-print-none
-                .btn-list
-                    a.btn.btn-link(href="/dizest/logout")
-                        i.fas.fa-sign-out-alt
-                        span.d-none.d-sm-inline-block Logout
+            a.navbar-brand.navbar-brand-autodark.d-none-navbar-horizontal.pe-0.pe-md-3
+                img.navbar-brand-image(src="/resources/themes/dizest/img/logo.png" height="32" alt="DIZEST")
+
+            .navbar-nav.flex-row.order-md-last
+                .nav-item.d-none.d-md-flex.me-3
+                    .btn-list
+                        a.btn(href="https://github.com/season-framework/dizest" target="_blank" rel="noreferrer")
+                            i.fab.fa-github
+                            | Source code
+                        a.btn(href="/dizest/logout")
+                            i.fas.fa-sign-out-alt
+                            | Logout
                         
-                    button.btn.btn-primary(ng-click="create()")
-                        i.fas.fa-plus
-                        span.d-none.d-sm-inline-block Create Workspace
-                    
-    .card
-        .card-table.table-responsive
-            table.table.table-vcenter.table-hover
-                thead
-                    th ID
-                    th Title
-                    th Description
-                    th Updated
-                    th
-                tr(ng-repeat="item in list")
-                    td.w-1.text-left.text-muted {{item.id}}
-                    td.w-1.text-left {{item.title}}
-                    td.text-left
-                        small.text-muted.ml-2 {{item.description}}
-                    td.w-1.text-muted {{item.updated}}
-                    td.w-1
-                        a.btn.btn-sm.btn-primary(href="/dizest/viewer/{{item.id}}")
-                            i.fas.fa-code-branch.mr-1
-                            | Workspace
+                        button.btn.btn-primary(ng-click="create()")
+                            i.fas.fa-plus
+                            | Create Workspace
 
-    #create-modal.modal.fade(tabindex="-1")
-        .modal-dialog.modal-sm(role='document')
-            .modal-content
-                .modal-body
-                    .modal-title Create Workspace
-                    input.form-control(ng-model="modal.data.title" placeholder="Namespace")
-                .modal-footer
-                    button.btn.btn-link.link-secondary.mr-auto(type='button' ng-click="modal.cancel()") Cancel
-                    button.btn.btn-primary(type='button' ng-click="modal.create(modal.data.title)") Create
+    .container.mt-4
+        .card
+            .card-table.table-responsive
+                table.table.table-vcenter.table-hover
+                    thead
+                        th ID
+                        th Title
+                        th Description
+                        th Updated
+                        th
+                    tr(ng-repeat="item in list")
+                        td.w-1.text-left.text-muted {{item.id}}
+                        td.w-1.text-left {{item.title}}
+                        td.text-left
+                            small.text-muted.ml-2 {{item.description}}
+                        td.w-1.text-muted {{item.updated}}
+                        td.w-1
+                            a.btn.btn-sm.btn-primary(href="/dizest/viewer/{{item.id}}")
+                                i.fas.fa-code-branch
+                                | Workspace
+
+        #create-modal.modal.fade(tabindex="-1")
+            .modal-dialog.modal-sm(role='document')
+                .modal-content
+                    .modal-body
+                        .modal-title Create Workspace
+                        input.form-control(ng-model="modal.data.title" placeholder="Namespace" ng-enter="modal.create(modal.data.title)")
+                    .modal-footer
+                        button.btn.btn-link.link-secondary.mr-auto(type='button' ng-click="modal.cancel()") Cancel
+                        button.btn.btn-primary(type='button' ng-click="modal.create(modal.data.title)") Create

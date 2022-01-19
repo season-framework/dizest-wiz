@@ -6,3 +6,7 @@
         border-radius: 0;       
     }
 }
+
+.btn i {
+    margin-right: 6px;
+}
